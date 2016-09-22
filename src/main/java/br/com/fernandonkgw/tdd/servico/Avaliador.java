@@ -32,6 +32,10 @@ public class Avaliador {
 		
 		media = total / leilao.getLances().size();
 		
+		pegaOsMaioresNo(leilao);
+	}
+
+	private void pegaOsMaioresNo(Leilao leilao) {
 		maiores = new ArrayList<>(leilao.getLances());
 		Collections.sort(maiores, new Comparator<Lance>() {
 
