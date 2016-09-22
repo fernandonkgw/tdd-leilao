@@ -120,7 +120,18 @@ public class AvaliadorTest {
 		double menorEsperado = 100.0;
 		assertEquals(maiorEsperado, leiloeiro.getMaiorLance(), 0.00001);
 		assertEquals(menorEsperado, leiloeiro.getMenorLance(), 0.00001);
+	}
+	
+	@Test
+	public void deveDevolverListaVaziaCasoNaoHajaLances() {
 		
+		Leilao leilao = new Leilao("Playstation 3 Novo");
+		Avaliador leiloeiro = new Avaliador();
+		leiloeiro.avalia(leilao);
+		
+		List<Lance> maiores = leiloeiro.getTresMaiores();
+		
+		assertEquals(0, maiores.size());
 	}
 	
 	@Test
