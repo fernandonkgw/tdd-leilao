@@ -1,2 +1,2 @@
 # tdd-leilao
-Projeto do Curso de Test Unitário
+Projeto do Curso de Teste Unitário
