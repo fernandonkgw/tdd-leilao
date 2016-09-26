@@ -17,6 +17,10 @@ public class Avaliador {
 
 	public void avalia(Leilao leilao) {
 		
+		if (leilao.getLances().isEmpty()) {
+			throw new RuntimeException("Nao eh possivel avaliar um leilao sem lances!");
+		}
+		
 		double total = 0;
 		
 		for (Lance lance : leilao.getLances()) {
