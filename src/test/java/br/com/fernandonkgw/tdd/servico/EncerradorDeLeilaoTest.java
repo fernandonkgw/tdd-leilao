@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.junit.Test;
@@ -20,8 +21,7 @@ public class EncerradorDeLeilaoTest {
 
 	@Test
 	public void deveEncerrarLeiloesQueComecaramUmaSemanaAntes() {
-		Calendar antiga = Calendar.getInstance();
-		antiga.set(1999, 1, 20);
+		Calendar antiga = new GregorianCalendar(1999, Calendar.FEBRUARY, 20);
 		
 		Leilao leilao1 = new CriadorDeLeilao().para("TV de Plasma").naData(antiga).constroi();
 		Leilao leilao2 = new CriadorDeLeilao().para("Geladeira").naData(antiga).constroi();
