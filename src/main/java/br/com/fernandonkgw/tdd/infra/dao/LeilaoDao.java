@@ -15,7 +15,7 @@ import br.com.fernandonkgw.tdd.dominio.Lance;
 import br.com.fernandonkgw.tdd.dominio.Leilao;
 import br.com.fernandonkgw.tdd.dominio.Usuario;
 
-public class LeilaoDao {
+public class LeilaoDao implements RepositorioDeLeiloes {
 
 	private Connection conexao;
 
