@@ -70,4 +70,8 @@ public class EncerradorDeLeilaoTest {
 		
 		assertThat(encerrador.getTotalEncerrados(), equalTo(0));
 	}
+	
+	public void deveAtualizarLeiloesEncerrados() {
+		
+	}
 }
