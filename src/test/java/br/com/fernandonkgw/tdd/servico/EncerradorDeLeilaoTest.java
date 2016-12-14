@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,14 +26,21 @@ import br.com.fernandonkgw.tdd.infra.dao.RepositorioDeLeiloes;
 public class EncerradorDeLeilaoTest {
 
 	private Calendar antiga;
+	private Calendar ontem;
 	private Leilao leilaoAntigoDeTvDePlasma;
 	private Leilao leilaoAntigoDeGeladeira;
+	private Leilao leilaoDeOntemDeTvDePlasma;
+	private Leilao leilaoDeOntemDeGeladeira;
 	
 	@Before
-	public void criaDatas() {
+	public void criaDatasELeiloes() {
 		antiga = new GregorianCalendar(1999, Calendar.FEBRUARY, 20);
+		ontem = Calendar.getInstance();
+		ontem.add(Calendar.DAY_OF_MONTH, -1);
 		leilaoAntigoDeTvDePlasma = new CriadorDeLeilao().para("TV de Plasma").naData(antiga).constroi();
 		leilaoAntigoDeGeladeira = new CriadorDeLeilao().para("Geladeira").naData(antiga).constroi();
+		leilaoDeOntemDeTvDePlasma = new CriadorDeLeilao().para("TV de Plasma").naData(ontem).constroi();
+		leilaoDeOntemDeGeladeira = new CriadorDeLeilao().para("Geladeira").naData(ontem).constroi();
 	}
 	
 	@Test
@@ -53,12 +61,8 @@ public class EncerradorDeLeilaoTest {
 	
 	@Test
 	public void naoDeveEncerrarLeiloesQueComecaramOntem() {
-		Calendar ontem = Calendar.getInstance();
-		ontem.add(Calendar.DAY_OF_MONTH, -1);
 		
-		Leilao leilao1 = new CriadorDeLeilao().para("TV de Plasma").naData(ontem).constroi();
-		Leilao leilao2 = new CriadorDeLeilao().para("Geladeira").naData(ontem).constroi();
-		List<Leilao> leiloesDeOntem = Arrays.asList(leilao1, leilao2);
+		List<Leilao> leiloesDeOntem = Arrays.asList(leilaoDeOntemDeTvDePlasma, leilaoDeOntemDeGeladeira);
 		
 		RepositorioDeLeiloes daoFalso = mock(RepositorioDeLeiloes.class);
 		when(daoFalso.correntes()).thenReturn(leiloesDeOntem);
@@ -67,8 +71,8 @@ public class EncerradorDeLeilaoTest {
 		encerrador.encerra();
 		
 		assertThat(encerrador.getTotalEncerrados(), equalTo(0));
-		assertFalse(leilao1.isEncerrado());
-		assertFalse(leilao2.isEncerrado());
+		assertFalse(leilaoDeOntemDeTvDePlasma.isEncerrado());
+		assertFalse(leilaoDeOntemDeGeladeira.isEncerrado());
 	}
 	
 	@Test
@@ -93,6 +97,23 @@ public class EncerradorDeLeilaoTest {
 		
 		// verifica se o método atualiza foi invocado
 		verify(daoFalso, times(1)).atualiza(leilaoAntigoDeTvDePlasma);
+	}
+	
+	@Test
+	public void naoDeveEncerrarLeiloesQueComecaramMenosDeUmaSemanaAtras() {
+		
+		RepositorioDeLeiloes daoFalso = mock(RepositorioDeLeiloes.class);
+		when(daoFalso.correntes()).thenReturn(Arrays.asList(leilaoDeOntemDeTvDePlasma, leilaoDeOntemDeGeladeira));
+		
+		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso);
+		encerrador.encerra();
+		
+		assertThat(encerrador.getTotalEncerrados(), equalTo(0));
+		assertFalse(leilaoDeOntemDeTvDePlasma.isEncerrado());
+		assertFalse(leilaoDeOntemDeGeladeira.isEncerrado());
+		
+		verify(daoFalso, never()).atualiza(leilaoDeOntemDeTvDePlasma);
+		verify(daoFalso, never()).atualiza(leilaoDeOntemDeGeladeira);
 	}
 	
 }
