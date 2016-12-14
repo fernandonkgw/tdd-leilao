@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.inOrder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 
 import br.com.fernandonkgw.tdd.builder.CriadorDeLeilao;
 import br.com.fernandonkgw.tdd.dominio.Leilao;
@@ -51,7 +53,9 @@ public class EncerradorDeLeilaoTest {
 		RepositorioDeLeiloes daoFalso = mock(RepositorioDeLeiloes.class);
 		when(daoFalso.correntes()).thenReturn(leiloesAntigos);
 		
-		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso);
+		EnviadorDeEmail carteiroFalso = mock(EnviadorDeEmail.class);
+		
+		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso, carteiroFalso);
 		encerrador.encerra();
 		
 		assertThat(encerrador.getTotalEncerrados(), equalTo(2));
@@ -67,7 +71,9 @@ public class EncerradorDeLeilaoTest {
 		RepositorioDeLeiloes daoFalso = mock(RepositorioDeLeiloes.class);
 		when(daoFalso.correntes()).thenReturn(leiloesDeOntem);
 		
-		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso);
+		EnviadorDeEmail carteiroFalso = mock(EnviadorDeEmail.class);
+		
+		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso, carteiroFalso);
 		encerrador.encerra();
 		
 		assertThat(encerrador.getTotalEncerrados(), equalTo(0));
@@ -80,7 +86,9 @@ public class EncerradorDeLeilaoTest {
 		RepositorioDeLeiloes daoFalso = mock(RepositorioDeLeiloes.class);
 		when(daoFalso.correntes()).thenReturn(new ArrayList<Leilao>());
 		
-		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso);
+		EnviadorDeEmail carteiroFalso = mock(EnviadorDeEmail.class);
+		
+		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso, carteiroFalso);
 		encerrador.encerra();
 		
 		assertThat(encerrador.getTotalEncerrados(), equalTo(0));
@@ -92,11 +100,20 @@ public class EncerradorDeLeilaoTest {
 		RepositorioDeLeiloes daoFalso = mock(RepositorioDeLeiloes.class);
 		when(daoFalso.correntes()).thenReturn(Arrays.asList(leilaoAntigoDeTvDePlasma));
 		
-		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso);
+		EnviadorDeEmail carteiroFalso = mock(EnviadorDeEmail.class);
+		
+		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso, carteiroFalso);
 		encerrador.encerra();
 		
+		// passamos os mocks que serão verificados
+		InOrder inOrder = inOrder(daoFalso, carteiroFalso);
+		
 		// verifica se o método atualiza foi invocado
-		verify(daoFalso, times(1)).atualiza(leilaoAntigoDeTvDePlasma);
+		// a primeira invocação
+		inOrder.verify(daoFalso, times(1)).atualiza(leilaoAntigoDeTvDePlasma);
+		
+		
+		inOrder.verify(carteiroFalso, times(1)).envia(leilaoAntigoDeTvDePlasma);
 	}
 	
 	@Test
@@ -105,7 +122,9 @@ public class EncerradorDeLeilaoTest {
 		RepositorioDeLeiloes daoFalso = mock(RepositorioDeLeiloes.class);
 		when(daoFalso.correntes()).thenReturn(Arrays.asList(leilaoDeOntemDeTvDePlasma, leilaoDeOntemDeGeladeira));
 		
-		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso);
+		EnviadorDeEmail carteiroFalso = mock(EnviadorDeEmail.class);
+		
+		EncerradorDeLeilao encerrador = new EncerradorDeLeilao(daoFalso, carteiroFalso);
 		encerrador.encerra();
 		
 		assertThat(encerrador.getTotalEncerrados(), equalTo(0));
