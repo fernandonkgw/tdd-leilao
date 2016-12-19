@@ -1,4 +1,4 @@
-package br.com.fernandonkgw.tdd.servico;
+package br.com.fernandonkgw.tdd.infra.email;
 
 import br.com.fernandonkgw.tdd.dominio.Leilao;
 
