@@ -4,12 +4,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.inOrder;
+import static org.mockito.Matchers.any;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,8 +87,6 @@ public class EncerradorDeLeilaoTest {
 	public void naoDeveEncerrarCasoNaoHajaNenhum() {
 		when(daoFalso.correntes()).thenReturn(new ArrayList<Leilao>());
 		
-		EnviadorDeEmail carteiroFalso = mock(EnviadorDeEmail.class);
-		
 		encerrador.encerra();
 		
 		assertThat(encerrador.getTotalEncerrados(), equalTo(0));
@@ -125,4 +125,42 @@ public class EncerradorDeLeilaoTest {
 		verify(daoFalso, never()).atualiza(leilaoDeOntemDeGeladeira);
 	}
 	
+	@Test
+	public void deveContinuarExecucaoMesmoQuandoDaoFalha() {
+		
+		when(daoFalso.correntes()).thenReturn(Arrays.asList(leilaoAntigoDeTvDePlasma, leilaoAntigoDeGeladeira));
+		
+		doThrow(new RuntimeException()).when(daoFalso).atualiza(leilaoAntigoDeTvDePlasma);
+		
+		encerrador.encerra();
+		
+		verify(daoFalso).atualiza(leilaoAntigoDeGeladeira);
+		verify(carteiroFalso).envia(leilaoAntigoDeGeladeira);
+	}
+	
+	@Test
+	public void deveContinuarExecucaoMesmoQuandoEnviadorDeEmailFalha() {
+		
+		when(daoFalso.correntes()).thenReturn(Arrays.asList(leilaoAntigoDeTvDePlasma, leilaoAntigoDeGeladeira));
+		
+		doThrow(new RuntimeException()).when(carteiroFalso).envia(leilaoAntigoDeTvDePlasma);
+		
+		encerrador.encerra();
+		
+		verify(daoFalso).atualiza(leilaoAntigoDeGeladeira);
+		verify(carteiroFalso).envia(leilaoAntigoDeGeladeira);
+	}
+	
+	@Test
+	public void naoDeveEnviarEmailQuandoDaoLancaExcecaoParaTodosLeiloes() {
+		
+		when(daoFalso.correntes()).thenReturn(Arrays.asList(leilaoAntigoDeTvDePlasma, leilaoAntigoDeGeladeira));
+		
+		doThrow(new RuntimeException()).when(daoFalso).atualiza(any(Leilao.class));
+		
+		encerrador.encerra();
+		
+		verify(carteiroFalso, never()).envia(leilaoAntigoDeTvDePlasma);
+		verify(carteiroFalso, never()).envia(leilaoAntigoDeGeladeira);
+	}
 }
