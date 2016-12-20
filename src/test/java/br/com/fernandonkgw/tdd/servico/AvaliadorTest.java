@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import br.com.fernandonkgw.tdd.builder.CriadorDeLeilao;
+import br.com.fernandonkgw.tdd.builder.LeilaoBuilder;
 import br.com.fernandonkgw.tdd.dominio.Lance;
 import br.com.fernandonkgw.tdd.dominio.Leilao;
 import br.com.fernandonkgw.tdd.dominio.Usuario;
@@ -34,11 +34,11 @@ public class AvaliadorTest {
 	public void deveEntenderLancesEmOrdemCrescente() {
 		
 		// parte 1: cenario
-		Leilao leilao = new CriadorDeLeilao().para("Playstation 3 Novo")
+		Leilao leilao = new LeilaoBuilder().para("Playstation 3 Novo")
 				.lance(joao, 250.0)
 				.lance(jose, 300.0)
 				.lance(maria, 400.0)
-				.constroi();
+				.build();
 		
 		// parte 2: acao, 
 		leiloeiro.avalia(leilao);
@@ -55,9 +55,9 @@ public class AvaliadorTest {
 	public void deveEntenderLeilaoComApenasUmLance() {
 		
 		// cenario: 1 Lance
-		Leilao leilao = new CriadorDeLeilao().para("Playstation 3 Novo")
+		Leilao leilao = new LeilaoBuilder().para("Playstation 3 Novo")
 				.lance(joao, 1000.0)
-				.constroi();
+				.build();
 		
 		// parte 2: acao, 
 		leiloeiro.avalia(leilao);
@@ -73,12 +73,12 @@ public class AvaliadorTest {
 	@Test
 	public void deveEncontrarTresMaioresLances() {
 		
-		Leilao leilao =  new CriadorDeLeilao().para("Playstation 3 Novo")
+		Leilao leilao =  new LeilaoBuilder().para("Playstation 3 Novo")
 				.lance(joao, 100.0)
 				.lance(maria, 200)
 				.lance(joao, 300)
 				.lance(maria, 400.0)
-				.constroi();
+				.build();
 		
 		leiloeiro.avalia(leilao);
 		
@@ -93,13 +93,13 @@ public class AvaliadorTest {
 	
 	@Test
 	public void deveEntenderLeilaoComLancesEmOrdemRandomica() {
-		Leilao leilao = new CriadorDeLeilao().para("Playstation 3 Novo")
+		Leilao leilao = new LeilaoBuilder().para("Playstation 3 Novo")
 				.lance(joao, 200.0)
 				.lance(maria, 250.0)
 				.lance(joao, 340.0)
 				.lance(maria, 100.0)
 				.lance(joao, 500)
-				.constroi();
+				.build();
 		
 		leiloeiro.avalia(leilao);
 		
@@ -112,12 +112,12 @@ public class AvaliadorTest {
 	@Test
 	public void deveEntenderLeilaoComLancesEmOrdemDecrescente() {
 		
-		Leilao leilao = new CriadorDeLeilao().para("Playstation 3 Novo")
+		Leilao leilao = new LeilaoBuilder().para("Playstation 3 Novo")
 				.lance(joao, 400.0)
 				.lance(maria, 300.0)
 				.lance(joao, 200.0)
 				.lance(maria, 100)
-				.constroi();
+				.build();
 		
 		leiloeiro.avalia(leilao);
 		
@@ -131,11 +131,11 @@ public class AvaliadorTest {
 	public void deveCalcularMedia() {
 		
 		// cenario: 3 lances em ordem crescentes
-		Leilao leilao = new CriadorDeLeilao().para("Playstation 3 Novo")
+		Leilao leilao = new LeilaoBuilder().para("Playstation 3 Novo")
 				.lance(maria, 300.0)
 				.lance(joao, 400.0)
 				.lance(jose, 500.0)
-				.constroi();
+				.build();
 		
 		// executa acao
 		leiloeiro.avalia(leilao);
@@ -146,7 +146,7 @@ public class AvaliadorTest {
 
 	@Test(expected=RuntimeException.class)
 	public void naoDeveAvaliarLeilaoSemLanceDado() {
-		Leilao leilao = new CriadorDeLeilao().para("Playstation 3").constroi();
+		Leilao leilao = new LeilaoBuilder().para("Playstation 3").build();
 		
 		leiloeiro.avalia(leilao);
 	}

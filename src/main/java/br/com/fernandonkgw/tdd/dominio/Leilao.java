@@ -39,7 +39,15 @@ public class Leilao {
 		this.valorInicial = valorInicial;
 		this.dono = dono;
 		this.usado = usado;
-	}	
+	}
+	
+	public Leilao(String descricao, Double valorInicial, Usuario dono, boolean usado, Calendar dataAbertura) {
+		this.descricao = descricao;
+		this.valorInicial = valorInicial;
+		this.dono = dono;
+		this.usado = usado;
+		this.dataAbertura = dataAbertura;
+	}
 
 	public Leilao(String descricao) {
 		this.descricao = descricao;
@@ -48,7 +56,6 @@ public class Leilao {
 	public Leilao(String descricao, Calendar data) {
 		this.descricao = descricao;
 		this.dataAbertura = data;
-		this.lances = new ArrayList<Lance>();
 	}
 
 	public void propoe(Lance lance) {

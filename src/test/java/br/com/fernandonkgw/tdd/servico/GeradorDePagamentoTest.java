@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import br.com.fernandonkgw.tdd.builder.CriadorDeLeilao;
+import br.com.fernandonkgw.tdd.builder.LeilaoBuilder;
 import br.com.fernandonkgw.tdd.dao.RepositorioDeLeiloes;
 import br.com.fernandonkgw.tdd.dao.RepositorioDePagamentos;
 import br.com.fernandonkgw.tdd.dominio.Leilao;
@@ -50,11 +50,11 @@ public class GeradorDePagamentoTest {
 	}
 
 	private Leilao criaLeilaComLancesDe2000e2500() {
-		return new CriadorDeLeilao()
+		return new LeilaoBuilder()
 			.para("Playstation")
 			.lance(new Usuario("Jose da Silva"), 2000.0)
 			.lance(new Usuario("Maria Pereira"), 2500)
-			.constroi();
+			.build();
 	}
 
 	@Test

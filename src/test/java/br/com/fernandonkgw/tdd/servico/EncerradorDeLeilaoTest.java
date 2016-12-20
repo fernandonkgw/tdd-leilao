@@ -23,7 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-import br.com.fernandonkgw.tdd.builder.CriadorDeLeilao;
+import br.com.fernandonkgw.tdd.builder.LeilaoBuilder;
 import br.com.fernandonkgw.tdd.dao.RepositorioDeLeiloes;
 import br.com.fernandonkgw.tdd.dominio.Leilao;
 import br.com.fernandonkgw.tdd.infra.email.EnviadorDeEmail;
@@ -45,10 +45,10 @@ public class EncerradorDeLeilaoTest {
 		antiga = new GregorianCalendar(1999, Calendar.FEBRUARY, 20);
 		ontem = Calendar.getInstance();
 		ontem.add(Calendar.DAY_OF_MONTH, -1);
-		leilaoAntigoDeTvDePlasma = new CriadorDeLeilao().para("TV de Plasma").naData(antiga).constroi();
-		leilaoAntigoDeGeladeira = new CriadorDeLeilao().para("Geladeira").naData(antiga).constroi();
-		leilaoDeOntemDeTvDePlasma = new CriadorDeLeilao().para("TV de Plasma").naData(ontem).constroi();
-		leilaoDeOntemDeGeladeira = new CriadorDeLeilao().para("Geladeira").naData(ontem).constroi();
+		leilaoAntigoDeTvDePlasma = new LeilaoBuilder().para("TV de Plasma").naData(antiga).build();
+		leilaoAntigoDeGeladeira = new LeilaoBuilder().para("Geladeira").naData(antiga).build();
+		leilaoDeOntemDeTvDePlasma = new LeilaoBuilder().para("TV de Plasma").naData(ontem).build();
+		leilaoDeOntemDeGeladeira = new LeilaoBuilder().para("Geladeira").naData(ontem).build();
 		daoFalso = mock(RepositorioDeLeiloes.class);
 		carteiroFalso = mock(EnviadorDeEmail.class);
 		encerrador = new EncerradorDeLeilao(daoFalso, carteiroFalso);

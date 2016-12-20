@@ -3,7 +3,6 @@ package br.com.fernandonkgw.tdd.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import java.util.Calendar;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -11,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import br.com.fernandonkgw.tdd.builder.CriadorDeLeilao;
+import br.com.fernandonkgw.tdd.builder.LeilaoBuilder;
 import br.com.fernandonkgw.tdd.dominio.Leilao;
 import br.com.fernandonkgw.tdd.dominio.Usuario;
 
@@ -21,6 +20,8 @@ public class LeilaoDaoTest {
 	private UsuarioDao usuarioDao;
 	private LeilaoDao leilaoDao;
 	private Usuario fernando;
+	private Leilao geladeiraNovaDoFernandoValor1500;
+	private Leilao xboxNovoDoFernandoValor500;
 
 	@Before
 	public void antesDeCadaTeste() {
@@ -30,6 +31,22 @@ public class LeilaoDaoTest {
 		fernando = new Usuario("Fernando", "fernando@gmail.com");
 		session.getTransaction().begin();
 		usuarioDao.salvar(fernando);
+		criaLeiloes();
+	}
+	
+	private void criaLeiloes() {
+		geladeiraNovaDoFernandoValor1500 = new LeilaoBuilder()
+			.para("Geladeira")
+			.novo()
+			.dono(fernando)
+			.comValorInicial(1500.0)
+			.build();
+		xboxNovoDoFernandoValor500 = new LeilaoBuilder()
+			.para("XBox")
+			.novo()
+			.dono(fernando)
+			.comValorInicial(500.0)
+			.build();
 	}
 	
 	@After
@@ -41,13 +58,10 @@ public class LeilaoDaoTest {
 	@Test
 	public void deveContarLeiloesNaoEncerrados() {
 		
-		Leilao ativo = new Leilao("Geladeira", 1500.0, fernando, false);
+		xboxNovoDoFernandoValor500.encerra();
 		
-		Leilao encerrado = new Leilao("TV", 700.0, fernando, false);
-		encerrado.encerra();
-		
-		leilaoDao.salvar(ativo);
-		leilaoDao.salvar(encerrado);
+		leilaoDao.salvar(geladeiraNovaDoFernandoValor1500);
+		leilaoDao.salvar(xboxNovoDoFernandoValor500);
 		
 		long total = leilaoDao.total();
 		
@@ -57,14 +71,12 @@ public class LeilaoDaoTest {
 	@Test
 	public void deveRetornarZeroCasoNaoHajaNenhumLeilaoNaoEncerrado() {
 		
-		Leilao leilaoDeGeladeira = new Leilao("Geladeira", 1500.0, fernando, false);
-		Leilao leilaoDeXBox = new Leilao("XBox", 500.0, fernando, false);
 		
-		leilaoDeGeladeira.encerra();
-		leilaoDeXBox.encerra();
+		geladeiraNovaDoFernandoValor1500.encerra();
+		xboxNovoDoFernandoValor500.encerra();
 		
-		leilaoDao.salvar(leilaoDeGeladeira);
-		leilaoDao.salvar(leilaoDeXBox);
+		leilaoDao.salvar(geladeiraNovaDoFernandoValor1500);
+		leilaoDao.salvar(xboxNovoDoFernandoValor500);
 		
 		long total = leilaoDao.total();
 		
@@ -74,10 +86,9 @@ public class LeilaoDaoTest {
 	@Test
 	public void deveRetornarLeiloesdeProdutoNovo() {
 		
-		Leilao leilaoDeGeladeiraNova = new Leilao("Geladeira", 1500.0, fernando, false);
 		Leilao leilaoDeXboxUsado = new Leilao("XBox", 500.0, fernando, true);
 		
-		leilaoDao.salvar(leilaoDeGeladeiraNova);
+		leilaoDao.salvar(geladeiraNovaDoFernandoValor1500);
 		leilaoDao.salvar(leilaoDeXboxUsado);
 		
 		List<Leilao> novos = leilaoDao.novos();
@@ -90,8 +101,9 @@ public class LeilaoDaoTest {
 	
 	@Test
 	public void deveRetornarLeiloesAntigos() {
-		Leilao leilaoAntigoDeGeladeira = new CriadorDeLeilao().para("Geladeira").naDataAntiga().constroi();
-		Leilao leilaoRecenteDeXBox = new CriadorDeLeilao().para("XBox").naData(Calendar.getInstance()).constroi();
+		
+		Leilao leilaoAntigoDeGeladeira = new LeilaoBuilder().para("Geladeira").dono(fernando).naDataAntiga().build();
+		Leilao leilaoRecenteDeXBox = new LeilaoBuilder().para("XBox").build();
 		
 		leilaoDao.salvar(leilaoAntigoDeGeladeira);
 		leilaoDao.salvar(leilaoRecenteDeXBox);
@@ -105,12 +117,12 @@ public class LeilaoDaoTest {
 	
 	@Test
 	public void naoDeveRetornarLeiloesDeUmaSemana() {
-		Leilao leilaoAntigoDeGeladeira = new CriadorDeLeilao().para("Geladeira").emUmaSemanaAtras().constroi();
+		Leilao leilaoAntigoDeGeladeira = new LeilaoBuilder().para("Geladeira").emUmaSemanaAtras().build();
 		
 		leilaoDao.salvar(leilaoAntigoDeGeladeira);
 		
 		List<Leilao> leiloesAntigos = leilaoDao.antigos();
 		
-		assertEquals(1L, leiloesAntigos.size());
+		assertEquals(0, leiloesAntigos.size());
 	}
 }
