@@ -1,135 +1,113 @@
 package br.com.fernandonkgw.tdd.dao;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import org.hibernate.Session;
 
 import br.com.fernandonkgw.tdd.dominio.Lance;
 import br.com.fernandonkgw.tdd.dominio.Leilao;
 import br.com.fernandonkgw.tdd.dominio.Usuario;
 
-public class LeilaoDao implements RepositorioDeLeiloes {
+public class LeilaoDao implements RepositorioDeLeiloes{
 
-	private Connection conexao;
+	private final Session session;
 
-	public LeilaoDao() {
-		try {
-			this.conexao = DriverManager.getConnection(
-					"jdbc:mysql://localhost/mocks", "root", "");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	public LeilaoDao(Session session) {
+		this.session = session;
 	}
-
-	private Calendar data(Date date) {
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		return c;
-	}
-
-	public void salva(Leilao leilao) {
-		try {
-			String sql = "INSERT INTO LEILAO (DESCRICAO, DATA, ENCERRADO) VALUES (?,?,?);";
-			PreparedStatement ps = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, leilao.getDescricao());
-			ps.setDate(2, new java.sql.Date(leilao.getData().getTimeInMillis()));
-			ps.setBoolean(3, leilao.isEncerrado());
-			
-			ps.execute();
-			
-			ResultSet generatedKeys = ps.getGeneratedKeys();
-	        if (generatedKeys.next()) {
-	            leilao.setId(generatedKeys.getInt(1));
-	        }
-			
-			for(Lance lance : leilao.getLances()) {
-				sql = "INSERT INTO LANCES (LEILAO_ID, USUARIO_ID, VALOR) VALUES (?,?,?);";
-				PreparedStatement ps2 = conexao.prepareStatement(sql);
-				ps2.setInt(1, leilao.getId());
-				ps2.setInt(2, lance.getUsuario().getId());
-				ps2.setDouble(3, lance.getValor());
-				
-				ps2.execute();
-				ps2.close();
-				
-			}
-			
-			ps.close();
-			
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+	
+	public void salvar(Leilao leilao) {
+		session.save(leilao);
 		
-	}
-	
-	public List<Leilao> encerrados() {
-		return porEncerrado(true);
-	}
-	
-	public List<Leilao> correntes() {
-		return porEncerrado(false);
-	}
-	
-	private List<Leilao> porEncerrado(boolean status) {
-		try {
-			String sql = "SELECT * FROM LEILAO WHERE ENCERRADO = " + status + ";";
-			
-			PreparedStatement ps = conexao.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
-			
-			List<Leilao> leiloes = new ArrayList<Leilao>();
-			while(rs.next()) {
-				Leilao leilao = new Leilao(rs.getString("descricao"), data(rs.getDate("data")));
-				leilao.setId(rs.getInt("id"));
-				if(rs.getBoolean("encerrado")) leilao.encerra();
-				
-				String sql2 = "SELECT VALOR, NOME, U.ID AS USUARIO_ID, L.ID AS LANCE_ID FROM LANCES L INNER JOIN USUARIO U ON U.ID = L.USUARIO_ID WHERE LEILAO_ID = " + rs.getInt("id");
-				PreparedStatement ps2 = conexao.prepareStatement(sql2);
-				ResultSet rs2 = ps2.executeQuery();
-				
-				while(rs2.next()) {
-					Usuario usuario = new Usuario(rs2.getInt("id"), rs2.getString("nome"));
-					Lance lance = new Lance(usuario, rs2.getDouble("valor"));
-					
-					leilao.propoe(lance);
-				}
-				rs2.close();
-				ps2.close();
-				
-				leiloes.add(leilao);
-				
-			}
-			rs.close();
-			ps.close();
-			
-			return leiloes;
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
+		for(Lance lance : leilao.getLances()) {
+			session.save(lance);
 		}
 	}
-
+	
+	public Leilao porId(int id) {
+		return (Leilao) session.get(Leilao.class, id);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Leilao> novos() {
+		return session.createQuery("from Leilao l where usado = false")
+				.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Leilao> antigos() {
+		Calendar seteDiasAtras = Calendar.getInstance();
+		seteDiasAtras.add(Calendar.DAY_OF_MONTH, -7);
+		
+		return session.createQuery("from Leilao l where dataAbertura < :data")
+				.setParameter("data", seteDiasAtras)
+				.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Leilao> porPeriodo(Calendar inicio, Calendar fim) {
+		return session.createQuery("from Leilao l where l.dataAbertura " +
+				"between :inicio and :fim and l.encerrado = false")
+				.setParameter("inicio", inicio)
+				.setParameter("fim", fim)
+				.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Leilao> disputadosEntre(double inicio, double fim) {
+		return session.createQuery("from Leilao l where l.valorInicial " +
+				"between :inicio and :fim and l.encerrado = false " +
+				"and size(l.lances) > 3")
+				.setParameter("inicio", inicio)
+				.setParameter("fim", fim)
+				.list();
+	}
+	
+	public Long total() {
+		return (Long) session.createQuery("select count(l) from Leilao l where l.encerrado = false")
+				.uniqueResult();
+	}
+	
 	public void atualiza(Leilao leilao) {
-		
-		try {
-			String sql = "UPDATE LEILAO SET DESCRICAO=?, DATA=?, ENCERRADO=? WHERE ID = ?;";
-			PreparedStatement ps = conexao.prepareStatement(sql);
-			ps.setString(1, leilao.getDescricao());
-			ps.setDate(2, new java.sql.Date(leilao.getData().getTimeInMillis()));
-			ps.setBoolean(3, leilao.isEncerrado());
-			ps.setInt(4, leilao.getId());
-
-			ps.execute();
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+		session.merge(leilao);
 	}
 	
-	public int x() { return 10; }
+	public void deleta(Leilao leilao) {
+		session.delete(leilao);
+	}
+	
+	public void deletaEncerrados() {
+		session
+			.createQuery("delete from Leilao l where l.encerrado = true")
+			.executeUpdate();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Leilao> listaLeiloesDoUsuario(Usuario usuario) {
+		return session.createQuery("select lance.leilao " +
+								   "from Lance lance " +
+								   "where lance.usuario = :usuario")
+				.setParameter("usuario", usuario).list();
+	}
+	
+	public double getValorInicialMedioDoUsuario(Usuario usuario) {
+		return (Double) session.createQuery("select avg(lance.leilao.valorInicial) " +
+											"from Lance lance " +
+											"where lance.usuario = :usuario")
+					.setParameter("usuario", usuario)
+					.uniqueResult();
+	}
+
+	@Override
+	public List<Leilao> encerrados() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Leilao> correntes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

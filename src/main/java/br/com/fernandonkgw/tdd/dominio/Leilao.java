@@ -5,13 +5,29 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+
+@Entity
 public class Leilao {
 
 	private String descricao;
 	private Calendar data;
+	@OneToMany(cascade=CascadeType.ALL, orphanRemoval=true, mappedBy="leilao")
 	private List<Lance> lances;
 	private boolean encerrado;
+	@Id @GeneratedValue
 	private int id;
+	@ManyToOne
+	private Usuario dono;
+	private Double valorInicial;
+	private boolean usado;
+	
 
 	public Leilao(String descricao) {
 		this.descricao = descricao;
@@ -104,6 +120,30 @@ public class Leilao {
 
 	public void setEncerrado(boolean encerrado) {
 		this.encerrado = encerrado;
+	}
+
+	public Usuario getDono() {
+		return dono;
+	}
+
+	public void setDono(Usuario dono) {
+		this.dono = dono;
+	}
+
+	public Double getValorInicial() {
+		return valorInicial;
+	}
+
+	public void setValorInicial(Double valorInicial) {
+		this.valorInicial = valorInicial;
+	}
+
+	public boolean isUsado() {
+		return usado;
+	}
+
+	public void setUsado(boolean usado) {
+		this.usado = usado;
 	}
 
 }

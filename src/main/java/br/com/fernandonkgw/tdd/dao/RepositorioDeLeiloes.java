@@ -6,7 +6,7 @@ import br.com.fernandonkgw.tdd.dominio.Leilao;
 
 public interface RepositorioDeLeiloes {
 
-	void salva(Leilao leilao);
+	void salvar(Leilao leilao);
 	
 	List<Leilao> encerrados();
 	

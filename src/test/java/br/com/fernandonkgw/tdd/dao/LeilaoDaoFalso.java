@@ -9,7 +9,7 @@ public class LeilaoDaoFalso implements RepositorioDeLeiloes {
 
 	private static List<Leilao> leiloes = new ArrayList<Leilao>();;
 	
-	public void salva(Leilao leilao) {
+	public void salvar(Leilao leilao) {
 		leiloes.add(leilao);
 	}
 
