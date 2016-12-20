@@ -18,10 +18,12 @@ public class UsuarioDaoTest {
 	public void antesDeCadaTeste() {
 		session = new CriadorDeSessao().getSession();
 		usuarioDao = new UsuarioDao(session);
+		session.getTransaction().begin();
 	}
 	
 	@After
 	public void depoisDeCadaTeste() {
+		session.getTransaction().rollback();
 		session.close();
 	}
 	

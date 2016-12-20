@@ -13,13 +13,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 
+
 @Entity
 public class Leilao {
 
 	private String descricao;
-	private Calendar data;
+	private Calendar dataAbertura;
 	@OneToMany(cascade=CascadeType.ALL, orphanRemoval=true, mappedBy="leilao")
-	private List<Lance> lances;
+	private List<Lance> lances = new ArrayList<>();
 	private boolean encerrado;
 	@Id @GeneratedValue
 	private int id;
@@ -27,16 +28,26 @@ public class Leilao {
 	private Usuario dono;
 	private Double valorInicial;
 	private boolean usado;
+
+	public Leilao() {
+		this.dataAbertura = Calendar.getInstance();
+	}
 	
+	public Leilao(String descricao, Double valorInicial, Usuario dono, boolean usado) {
+		this();
+		this.descricao = descricao;
+		this.valorInicial = valorInicial;
+		this.dono = dono;
+		this.usado = usado;
+	}	
 
 	public Leilao(String descricao) {
 		this.descricao = descricao;
-		this.lances = new ArrayList<Lance>();
 	}
 
 	public Leilao(String descricao, Calendar data) {
 		this.descricao = descricao;
-		this.data = data;
+		this.dataAbertura = data;
 		this.lances = new ArrayList<Lance>();
 	}
 
@@ -102,12 +113,12 @@ public class Leilao {
 		this.encerrado = true;
 	}
 
-	public Calendar getData() {
-		return data;
+	public Calendar getDataAbertura() {
+		return dataAbertura;
 	}
 
-	public void setData(Calendar data) {
-		this.data = data;
+	public void setDataAbertura(Calendar dataAbertura) {
+		this.dataAbertura = dataAbertura;
 	}
 
 	public int getId() {

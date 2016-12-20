@@ -50,4 +50,18 @@ public class CriadorDeLeilao {
 		return leilao;
 	}
 
+	public CriadorDeLeilao naDataAntiga() {
+		Calendar antiga = Calendar.getInstance();
+		antiga.add(Calendar.DAY_OF_MONTH, -10);
+		this.data = antiga;
+		return this;
+	}
+
+	public CriadorDeLeilao emUmaSemanaAtras() {
+		Calendar umaSemanaAtras = Calendar.getInstance();
+		umaSemanaAtras.add(Calendar.DAY_OF_MONTH, -7);
+		this.data = umaSemanaAtras;
+		return this;
+	}
+
 }

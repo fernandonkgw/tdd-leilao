@@ -38,7 +38,7 @@ public class EncerradorDeLeilao {
 	}
 
 	private boolean comecouSemanaPassada(Leilao leilao) {
-		return diasEntre(leilao.getData(), Calendar.getInstance()) >= 7;
+		return diasEntre(leilao.getDataAbertura(), Calendar.getInstance()) >= 7;
 	}
 
 	private int diasEntre(Calendar inicio, Calendar fim) {
