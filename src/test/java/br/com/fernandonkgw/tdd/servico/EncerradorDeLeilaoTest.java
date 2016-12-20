@@ -24,8 +24,8 @@ import org.junit.Test;
 import org.mockito.InOrder;
 
 import br.com.fernandonkgw.tdd.builder.CriadorDeLeilao;
+import br.com.fernandonkgw.tdd.dao.RepositorioDeLeiloes;
 import br.com.fernandonkgw.tdd.dominio.Leilao;
-import br.com.fernandonkgw.tdd.infra.dao.RepositorioDeLeiloes;
 import br.com.fernandonkgw.tdd.infra.email.EnviadorDeEmail;
 
 public class EncerradorDeLeilaoTest {

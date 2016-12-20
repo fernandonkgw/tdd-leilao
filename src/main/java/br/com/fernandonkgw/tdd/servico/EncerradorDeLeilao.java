@@ -3,8 +3,8 @@ package br.com.fernandonkgw.tdd.servico;
 import java.util.Calendar;
 import java.util.List;
 
+import br.com.fernandonkgw.tdd.dao.RepositorioDeLeiloes;
 import br.com.fernandonkgw.tdd.dominio.Leilao;
-import br.com.fernandonkgw.tdd.infra.dao.RepositorioDeLeiloes;
 import br.com.fernandonkgw.tdd.infra.email.EnviadorDeEmail;
 
 public class EncerradorDeLeilao {

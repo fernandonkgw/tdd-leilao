@@ -3,12 +3,12 @@ package br.com.fernandonkgw.tdd.servico;
 import java.util.Calendar;
 import java.util.List;
 
+import br.com.fernandonkgw.tdd.dao.RepositorioDeLeiloes;
+import br.com.fernandonkgw.tdd.dao.RepositorioDePagamentos;
 import br.com.fernandonkgw.tdd.dominio.Leilao;
 import br.com.fernandonkgw.tdd.dominio.Pagamento;
 import br.com.fernandonkgw.tdd.dominio.Relogio;
 import br.com.fernandonkgw.tdd.dominio.RelogioDoSistema;
-import br.com.fernandonkgw.tdd.infra.dao.RepositorioDeLeiloes;
-import br.com.fernandonkgw.tdd.infra.dao.RepositorioDePagamentos;
 
 public class GeradorDePagamento {
 

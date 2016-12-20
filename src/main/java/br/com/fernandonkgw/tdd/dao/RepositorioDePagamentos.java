@@ -1,4 +1,4 @@
-package br.com.fernandonkgw.tdd.infra.dao;
+package br.com.fernandonkgw.tdd.dao;
 
 import br.com.fernandonkgw.tdd.dominio.Pagamento;
 
