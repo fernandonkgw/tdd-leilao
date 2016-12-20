@@ -52,7 +52,6 @@ public class EncerradorDeLeilaoTest {
 		daoFalso = mock(RepositorioDeLeiloes.class);
 		carteiroFalso = mock(EnviadorDeEmail.class);
 		encerrador = new EncerradorDeLeilao(daoFalso, carteiroFalso);
-		
 	}
 	
 	@Test
